@@ -3908,7 +3908,7 @@ MonoBehaviour:
   highScoreTxt: {fileID: 640584432}
   leaderBoardTxt: {fileID: 1808351228}
   leaderBoardGOTxt: {fileID: 406922607}
-  canSavePreviousPseudo: 0
+  canSavePreviousPseudo: 1
 --- !u!4 &840295586
 Transform:
   m_ObjectHideFlags: 0

@@ -43,7 +43,6 @@ public class GameManager : MonoBehaviour
 
     void Awake()
     {
-        //Pseudo.OnPseudoSubmited += StartWithDelay;
         if(instance == null)
         {
             instance = this;
