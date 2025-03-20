@@ -2182,7 +2182,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1196567673}
   m_HandleRect: {fileID: 1196567672}
   m_Direction: 2
-  m_Value: 0.9999998
+  m_Value: 1
   m_Size: 0.6116606
   m_NumberOfSteps: 0
   m_OnValueChanged:
@@ -3898,12 +3898,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   gameOverCanvas: {fileID: 2032813965}
-  countDownTxt: {fileID: 308208282}
   pseudoInputField: {fileID: 950359436}
-  saveManager: {fileID: 1838098945}
+  mongoManager: {fileID: 1838098947}
   pseudoCanvas: {fileID: 442896769}
   popUpErrorTxt: {fileID: 114459653}
   showPseudo: {fileID: 707306715}
+  countDownTxt: {fileID: 308208282}
   currentScoreTxt: {fileID: 1669016189}
   highScoreTxt: {fileID: 640584432}
   leaderBoardTxt: {fileID: 1808351228}
@@ -7634,6 +7634,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1838098946}
   - component: {fileID: 1838098945}
+  - component: {fileID: 1838098947}
   m_Layer: 0
   m_Name: DataManager
   m_TagString: Untagged
@@ -7653,6 +7654,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0a648e74b0d31ad4082b70321e15ab6a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  saveData:
+    players: []
+  savePath: 
 --- !u!4 &1838098946
 Transform:
   m_ObjectHideFlags: 0
@@ -7668,6 +7672,18 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1838098947
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1838098944}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8556f7d9fd092b94e92c168ec14f8645, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1853500090
 GameObject:
   m_ObjectHideFlags: 0
@@ -8534,8 +8550,8 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 293766793}
   m_HandleRect: {fileID: 293766792}
   m_Direction: 0
-  m_Value: 0.000001036452
-  m_Size: 0.9606698
+  m_Value: 0
+  m_Size: 0.9606697
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:

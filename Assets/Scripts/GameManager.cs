@@ -3,40 +3,40 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using TMPro;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using UnityEngine.UI;
 
 public class GameManager : MonoBehaviour
 {
     public static GameManager instance;
 
     public static event Action<float> OnSetVelocity;
-    float velocity = 1.3f;
-
     public static event Action<bool> OnEnableToStart;
 
     [SerializeField] private GameObject gameOverCanvas;
     
+    float velocity = 1.3f;
     float timerStart = 3f;
-    [SerializeField] TextMeshProUGUI countDownTxt;
+    int highScore = 0;
 
     [SerializeField] TMP_InputField pseudoInputField;
-    string pseudo;
-    [SerializeField] private SaveDataJSON saveManager;
+
+    [SerializeField] private MongoManager mongoManager;
+
     [SerializeField] private Canvas pseudoCanvas;
 
     [SerializeField] private TextMeshProUGUI popUpErrorTxt;
     [SerializeField] private TextMeshProUGUI showPseudo;
+    [SerializeField] TextMeshProUGUI countDownTxt;
 
-    private int actualScore;
     [SerializeField] private TextMeshProUGUI currentScoreTxt;
     [SerializeField] private TextMeshProUGUI highScoreTxt;
 
     [SerializeField] private TextMeshProUGUI leaderBoardTxt;
     [SerializeField] private TextMeshProUGUI leaderBoardGOTxt;
 
+    private int actualScore;
+    string pseudo;
     public bool canSavePreviousPseudo = true;
     private bool isCroissant = true;
     private bool thisMonth = false;
@@ -61,12 +61,12 @@ public class GameManager : MonoBehaviour
         {
             pseudo = PlayerPrefs.GetString("SavedPseudo");
             pseudoCanvas.enabled = false; // Cache l'écran de connexion
-            highScoreTxt.text = saveManager.LoadData(pseudo).ToString();
             StartCoroutine(StartCountdown()); // Lancer directement le jeu
         }
         else
         {
-            ShowLeaderBoard();
+            pseudoCanvas.enabled = true;
+            StartCoroutine(GetAndDisplayLeaderboard());
         }
     }
 
@@ -79,9 +79,18 @@ public class GameManager : MonoBehaviour
             return;
         }
 
-        if(saveManager.PseudoExistance(pseudo))
+        StartCoroutine(CheckPseudoExists(pseudo));
+    }
+
+    // Vérif de l'existance du pseudo
+    private IEnumerator CheckPseudoExists(string _pseudo)
+    {
+        bool exists = false;
+        yield return StartCoroutine(mongoManager.AddPlayerCoroutine(_pseudo, (result) => exists = result)); // Retourne exist en vrai ou faux
+
+        if (!exists) //Le pseudo existe déjà
         {
-            popUpErrorTxt.text = "Le pseudo renseigné existe déjà, veuillez vous connecter";
+            popUpErrorTxt.text = "Le pseudo existe déjà, veuillez vous connecter.";
         }
         else
         {
@@ -98,13 +107,21 @@ public class GameManager : MonoBehaviour
             return;
         }
 
-        if(saveManager.PseudoExistance(pseudo))
+        StartCoroutine(CheckPseudoExistsForLogin(pseudo));
+    }
+
+    private IEnumerator CheckPseudoExistsForLogin(string _pseudo)
+    {
+        bool exists = false;
+        yield return StartCoroutine(mongoManager.CheckPseudoExistCoroutine(_pseudo, (result) => exists = result));
+
+        if (exists)
         {
             OnStartGame();
         }
         else
         {
-            popUpErrorTxt.text = "Le pseudo renseigné n'existe pas, veuillez le créer";
+            popUpErrorTxt.text = "Le pseudo n'existe pas, veuillez le créer.";
         }
     }
 
@@ -113,10 +130,6 @@ public class GameManager : MonoBehaviour
         popUpErrorTxt.text = "";
 
         PlayerPrefs.SetString("SavedPseudo", pseudo); // Sauvegarde du pseudo pour la prochaine partie
-        //PlayerPrefs.Save();
-
-        int savedHighScore = saveManager.LoadData(pseudo);
-        highScoreTxt.text = savedHighScore.ToString();
 
         pseudoCanvas.enabled = false;
         StartCoroutine(StartCountdown());
@@ -129,7 +142,7 @@ public class GameManager : MonoBehaviour
         Time.timeScale = 0f;
         OnEnableToStart?.Invoke(false);
 
-        ShowLeaderBoard();
+        StartCoroutine(GetAndDisplayLeaderboard());
     }
 
     public void RestartGame()
@@ -140,6 +153,9 @@ public class GameManager : MonoBehaviour
     //Démarre un compte à rebour de 3s avant que le jeu ne commence
     private IEnumerator StartCountdown()
     {
+        yield return StartCoroutine(mongoManager.GetScoreOfThisPlayerCoroutine(pseudo, (score) => highScore = score));
+
+        highScoreTxt.text = highScore.ToString();
         float timeRemaining = timerStart;
         countDownTxt.enabled = true;
 
@@ -167,15 +183,16 @@ public class GameManager : MonoBehaviour
     {
         actualScore++;
         currentScoreTxt.text = actualScore.ToString();
-        UpdateHighScore();
+        StartCoroutine(UpdateHighScore());
     }
 
-    private void UpdateHighScore()
+    private IEnumerator UpdateHighScore()
     {
-        if(actualScore > saveManager.LoadData(pseudo))
+        yield return StartCoroutine(mongoManager.GetScoreOfThisPlayerCoroutine(pseudo, (score) => highScore = score)); // Je récupère le highscore de ce player
+
+        if(actualScore > highScore)
         {
-            saveManager.SaveData(pseudo, actualScore);
-            Debug.Log($"Highscore actualisé pour {pseudo}");
+            yield return StartCoroutine(mongoManager.UpdateScoreCoroutine(pseudo, actualScore));
             highScoreTxt.text = actualScore.ToString();
         }
     }
@@ -189,21 +206,21 @@ public class GameManager : MonoBehaviour
     public void OnToogleChanged(bool _isOn)
     {
         isCroissant = _isOn;
-        ShowLeaderBoard();
+        StartCoroutine(GetAndDisplayLeaderboard());
     }
 
     public void OnToogleDateChanged(bool _isOn)
     {
         thisMonth = _isOn;
-        ShowLeaderBoard();
+        StartCoroutine(GetAndDisplayLeaderboard());
     }
 
     //Gestion du leaderBoard. Par défaut croissant
-    public void ShowLeaderBoard() // Mon premier parametre ne peut etre rien
-    {   
-        List<PlayerData> sortedPlayers = saveManager.GetSortedLeaderboard(isCroissant); // True par défaut
+    private IEnumerator GetAndDisplayLeaderboard()
+    {
+        List<PlayerData> sortedPlayers = new List<PlayerData>();
+        yield return StartCoroutine(mongoManager.GetScoresCoroutine(isCroissant, (result) => sortedPlayers = result));
 
-        // Filtrer les scores du mois
         if(thisMonth)
         {
             DateTime currentMonth = DateTime.Now;
@@ -213,16 +230,13 @@ public class GameManager : MonoBehaviour
         }
 
         leaderBoardTxt.text = "";
-        
         int rank = 1;
-        foreach(var player in sortedPlayers)
+        foreach (var player in sortedPlayers) //Mets les players par ordre vis-à-vis de leur score
         {
-            string formattedDate = DateTime.Parse(player.date).ToString("dd/MM/yyyy"); // Affiche jour/mois/année
-
-            leaderBoardTxt.text += $"{rank}. {player.pseudo} - {player.highscore} : {formattedDate}\n";
+            string formattedDate = DateTime.Parse(player.date).ToString("dd/MM/yyyy");
+            leaderBoardTxt.text += $"{rank}. {player.name} - {player.highscore} : {formattedDate}\n";
             rank++;
         }
-
         leaderBoardGOTxt.text = leaderBoardTxt.text;
     }
 
