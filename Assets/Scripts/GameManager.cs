@@ -141,7 +141,6 @@ public class GameManager : MonoBehaviour
     {
         gameOverCanvas.SetActive(true);
 
-        //Time.timeScale = 0f;
         OnEnableToStart?.Invoke(false);
 
         StartCoroutine(GetAndDisplayLeaderboard());

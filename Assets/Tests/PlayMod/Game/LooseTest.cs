@@ -60,7 +60,6 @@ public class LooseTest
         }
 
         // On replay
-        //Time.timeScale = 1f;
         gameManager.RestartGame();
         yield return new WaitForSeconds(1f); // Attendre un peu pour la transition
 
