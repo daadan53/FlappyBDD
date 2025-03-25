@@ -14,6 +14,7 @@ public class GameManager : MonoBehaviour
     public static event Action<bool> OnEnableToStart;
 
     [SerializeField] private GameObject gameOverCanvas;
+    public GameObject GameOverCanvas => gameOverCanvas;
     
     float velocity = 1.3f;
     float timerStart = 3f;
@@ -22,6 +23,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] TMP_InputField pseudoInputField;
 
     [SerializeField] private MongoManager mongoManager;
+    public MongoManager MongoManager => mongoManager;
 
     [SerializeField] private Canvas pseudoCanvas;
 
@@ -139,7 +141,7 @@ public class GameManager : MonoBehaviour
     {
         gameOverCanvas.SetActive(true);
 
-        Time.timeScale = 0f;
+        //Time.timeScale = 0f;
         OnEnableToStart?.Invoke(false);
 
         StartCoroutine(GetAndDisplayLeaderboard());

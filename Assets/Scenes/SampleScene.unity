@@ -1222,7 +1222,7 @@ GameObject:
   - component: {fileID: 406922608}
   - component: {fileID: 406922607}
   m_Layer: 5
-  m_Name: TextClassement
+  m_Name: TextClassementGO
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -7633,7 +7633,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1838098946}
-  - component: {fileID: 1838098945}
   - component: {fileID: 1838098947}
   m_Layer: 0
   m_Name: DataManager
@@ -7642,21 +7641,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &1838098945
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1838098944}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0a648e74b0d31ad4082b70321e15ab6a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  saveData:
-    players: []
-  savePath: 
 --- !u!4 &1838098946
 Transform:
   m_ObjectHideFlags: 0
