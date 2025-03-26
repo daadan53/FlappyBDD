@@ -189,8 +189,6 @@ public class GameManager : MonoBehaviour
 
     private IEnumerator UpdateHighScore()
     {
-        yield return StartCoroutine(mongoManager.GetScoreOfThisPlayerCoroutine(pseudo, (score) => highScore = score)); // Je récupère le highscore de ce player
-
         if(actualScore > highScore)
         {
             yield return StartCoroutine(mongoManager.UpdateScoreCoroutine(pseudo, actualScore));

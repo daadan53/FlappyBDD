@@ -24,6 +24,7 @@ public class Fly : MonoBehaviour
         rb.gravityScale = 0;
     }
 
+    //Applique uen rotation en fonction de sa vélocitée
     private void FixedUpdate()
     {
         transform.rotation = Quaternion.Euler(0,0,rb.linearVelocity.y * rotationSpeed);

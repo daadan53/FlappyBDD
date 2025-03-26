@@ -18,6 +18,7 @@ public class MongoManager : MonoBehaviour
 
     public IEnumerator AddPlayerCoroutine(string _playerName, Action<bool> _callback)
     {
+        // Formulaire HTTP pour envoyer des données en POST
         WWWForm form = new WWWForm();
         form.AddField("name", _playerName);
 
@@ -79,7 +80,8 @@ public class MongoManager : MonoBehaviour
             {
                 Debug.Log("Réponse : " + www.downloadHandler.text);
 
-                List<PlayerData> scores = JsonUtility.FromJson<SaveDataList>("{\"players\":" + www.downloadHandler.text + "}").players;
+                //JSON Utility ne sait pas désérialiser sans qu'il y ai de clé donc on rajoute la clé "players"
+                List<PlayerData> scores = JsonUtility.FromJson<SaveDataList>("{\"players\":" + www.downloadHandler.text + "}").players; //Désérialise en liste de PlayerData et récupère la liste des scores
 
                 if (_isCroissant)
                 {
@@ -148,7 +150,7 @@ public class MongoManager : MonoBehaviour
                 
                 if (json.Count > 0)
                 {
-                    int highScore = json["highscore"].AsInt; // On récupère seulement la première clé du tableau et seulement highscore 
+                    int highScore = json["highscore"].AsInt; // On récupère seulement highscore 
                     _callback(highScore);
                 }
                 else
@@ -163,11 +165,6 @@ public class MongoManager : MonoBehaviour
                 _callback(0); // En cas d'erreur, retourne 0
             }
         }
-
-    }
-
-    public void CheckPseudoExist(string _playerName )
-    {
 
     }
 }
